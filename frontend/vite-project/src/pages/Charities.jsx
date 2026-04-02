@@ -15,14 +15,15 @@ export default function Charities() {
   const [selecting, setSelecting] = useState(null);
   const [msg, setMsg] = useState("");
 
-  useEffect(() => {
-    fetchCharities();
-  }, []);
+  useEffect(() => { fetchCharities(); }, []);
 
   useEffect(() => {
     let result = charities;
     if (category !== "All") result = result.filter(c => c.cause === category);
-    if (search) result = result.filter(c => c.name.toLowerCase().includes(search.toLowerCase()) || c.description?.toLowerCase().includes(search.toLowerCase()));
+    if (search) result = result.filter(c =>
+      c.name.toLowerCase().includes(search.toLowerCase()) ||
+      c.description?.toLowerCase().includes(search.toLowerCase())
+    );
     setFiltered(result);
   }, [search, category, charities]);
 
@@ -32,19 +33,16 @@ export default function Charities() {
       const res = await fetch(`${API}/charity`);
       if (res.ok) {
         const data = await res.json();
-        // backend { charities, total, page, pages } return karta hai
         const list = data.charities || data || [];
         setCharities(list);
         setFiltered(list);
       }
-    } catch (e) {
-      console.error(e);
-    }
+    } catch (e) { console.error(e); }
     setLoading(false);
   };
 
   const selectCharity = async (charityId) => {
-    if (!token) return setMsg("Pehle login karo.");
+    if (!token) return setMsg("Please login to select a charity.");
     setSelecting(charityId);
     setMsg("");
     try {
@@ -54,10 +52,10 @@ export default function Charities() {
         body: JSON.stringify({ charityId }),
       });
       const data = await res.json();
-      if (res.ok) setMsg(`✓ ${data.charity?.name || "Charity"} select ho gayi!`);
-      else setMsg(data.message || "Error aaya.");
+      if (res.ok) setMsg(`✓ ${data.charity?.name || "Charity"} selected successfully!`);
+      else setMsg(data.message || "Something went wrong.");
     } catch {
-      setMsg("Server error.");
+      setMsg("Server error. Please try again.");
     }
     setSelecting(null);
   };
@@ -99,7 +97,7 @@ export default function Charities() {
           Choose Your <span style={{ background: "linear-gradient(135deg,#a78bfa,#7c3aed)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>Impact</span>
         </h1>
         <p style={{ color: "#6b7280", fontSize: 16, maxWidth: 480, margin: "0 auto" }}>
-          Apni subscription ka minimum 10% charity ko jata hai. Jis cause ko support karna ho, chunno.
+          A minimum of 10% of your subscription goes to charity. Choose the cause you want to support.
         </p>
         {msg && (
           <div style={{ display: "inline-block", marginTop: 20, padding: "10px 24px", borderRadius: 100, background: msg.startsWith("✓") ? "#052e16" : "#1a0a0a", border: `1px solid ${msg.startsWith("✓") ? "#4ade80" : "#ef4444"}44`, color: msg.startsWith("✓") ? "#4ade80" : "#ef4444", fontSize: 14, fontWeight: 500 }}>
@@ -113,11 +111,12 @@ export default function Charities() {
         <div style={{ display: "flex", flexWrap: "wrap", gap: 16, marginBottom: 36, alignItems: "center" }}>
           <div style={{ position: "relative", flex: "1 1 260px" }}>
             <span style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", fontSize: 16, color: "#4b5563" }}>🔍</span>
-            <input className="search-inp" placeholder="Charity dhundo..." value={search} onChange={e => setSearch(e.target.value)} />
+            <input className="search-inp" placeholder="Search charities..." value={search} onChange={e => setSearch(e.target.value)} />
           </div>
           <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
             {CATEGORIES.map(cat => (
-              <button key={cat} className="cat-btn" onClick={() => setCategory(cat)} style={{ background: category === cat ? "linear-gradient(135deg,#a78bfa,#7c3aed)" : "#0d0f18", color: category === cat ? "#fff" : "#6b7280", border: `1px solid ${category === cat ? "transparent" : "#1a1d2e"}` }}>
+              <button key={cat} className="cat-btn" onClick={() => setCategory(cat)}
+                style={{ background: category === cat ? "linear-gradient(135deg,#a78bfa,#7c3aed)" : "#0d0f18", color: category === cat ? "#fff" : "#6b7280", border: `1px solid ${category === cat ? "transparent" : "#1a1d2e"}` }}>
                 {cat}
               </button>
             ))}
@@ -125,7 +124,9 @@ export default function Charities() {
         </div>
 
         {/* Results count */}
-        <p style={{ color: "#4b5563", fontSize: 13, marginBottom: 20 }}>{filtered.length} charities mil rahi hain</p>
+        <p style={{ color: "#4b5563", fontSize: 13, marginBottom: 20 }}>
+          {filtered.length} {filtered.length === 1 ? "charity" : "charities"} found
+        </p>
 
         {/* Grid */}
         {loading ? (
@@ -133,7 +134,7 @@ export default function Charities() {
         ) : filtered.length === 0 ? (
           <div style={{ textAlign: "center", color: "#4b5563", padding: 80 }}>
             <p style={{ fontSize: 32, marginBottom: 12 }}>🔍</p>
-            <p>Koi charity nahi mili. Search change karo.</p>
+            <p>No charities found. Try a different search.</p>
           </div>
         ) : (
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }}>
@@ -141,32 +142,25 @@ export default function Charities() {
               const isSelected = user?.selectedCharity === charity._id;
               return (
                 <div key={charity._id} className="charity-card" style={{ borderColor: isSelected ? "#a78bfa44" : undefined }}>
-                  {/* Image / Icon */}
                   <div style={{ width: "100%", height: 140, borderRadius: 12, background: "linear-gradient(135deg,#1a0a3d,#0d0f18)", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 48, marginBottom: 18, overflow: "hidden", position: "relative" }}>
                     {charity.image ? <img src={charity.image} alt={charity.name} style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: 12 }} /> : <span>💚</span>}
                     {isSelected && (
                       <div style={{ position: "absolute", top: 10, right: 10, background: "#a78bfa", borderRadius: 100, padding: "3px 10px", fontSize: 11, color: "#fff", fontWeight: 600 }}>✓ Selected</div>
                     )}
                   </div>
-
-                  {/* Cause Tag */}
                   {(charity.cause || charity.category) && (
                     <span style={{ background: "#1a0a3d", border: "1px solid #a78bfa22", borderRadius: 100, padding: "3px 10px", fontSize: 11, color: "#a78bfa", fontWeight: 500, display: "inline-block", marginBottom: 10 }}>{charity.cause || charity.category}</span>
                   )}
-
                   <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: 18, fontWeight: 700, marginBottom: 8 }}>{charity.name}</h3>
                   <p style={{ color: "#6b7280", fontSize: 13, lineHeight: 1.6, marginBottom: 18, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                    {charity.description || "Yeh charity apne mission ke through community ko support karti hai."}
+                    {charity.description || "This charity supports the community through its mission and programs."}
                   </p>
-
-                  {/* Upcoming Event */}
                   {charity.upcomingEvent && (
                     <div style={{ background: "#13151f", borderRadius: 10, padding: "10px 14px", marginBottom: 16, fontSize: 12 }}>
                       <span style={{ color: "#f59e0b", fontWeight: 600 }}>🗓 Upcoming: </span>
                       <span style={{ color: "#9ca3af" }}>{charity.upcomingEvent}</span>
                     </div>
                   )}
-
                   <button
                     className="select-btn"
                     onClick={() => selectCharity(charity._id)}

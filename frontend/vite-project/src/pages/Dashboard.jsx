@@ -18,24 +18,9 @@ const statCard = (label, value, sub, accent) => (
       overflow: "hidden",
     }}
   >
-    <div
-      style={{
-        position: "absolute",
-        top: -30,
-        right: -30,
-        width: 100,
-        height: 100,
-        borderRadius: "50%",
-        background: `${accent}18`,
-        filter: "blur(20px)",
-      }}
-    />
-    <span style={{ color: "#6b7280", fontSize: 12, letterSpacing: 1, textTransform: "uppercase" }}>
-      {label}
-    </span>
-    <span style={{ color: "#fff", fontSize: 28, fontWeight: 700, fontFamily: "'Clash Display', sans-serif" }}>
-      {value}
-    </span>
+    <div style={{ position: "absolute", top: -30, right: -30, width: 100, height: 100, borderRadius: "50%", background: `${accent}18`, filter: "blur(20px)" }} />
+    <span style={{ color: "#6b7280", fontSize: 12, letterSpacing: 1, textTransform: "uppercase" }}>{label}</span>
+    <span style={{ color: "#fff", fontSize: 28, fontWeight: 700, fontFamily: "'Clash Display', sans-serif" }}>{value}</span>
     {sub && <span style={{ color: accent, fontSize: 12 }}>{sub}</span>}
   </div>
 );
@@ -76,9 +61,9 @@ export default function Dashboard() {
   };
 
   const submitScore = async () => {
-    if (!scoreInput || !scoreDate) return setScoreMsg("Score aur date dono bharo.");
+    if (!scoreInput || !scoreDate) return setScoreMsg("Please enter both score and date.");
     const val = parseInt(scoreInput);
-    if (val < 1 || val > 45) return setScoreMsg("Score 1–45 ke beech hona chahiye.");
+    if (val < 1 || val > 45) return setScoreMsg("Score must be between 1 and 45.");
     setScoreMsg("");
     try {
       const res = await fetch(`${API}/scores`, {
@@ -91,12 +76,12 @@ export default function Dashboard() {
         setScores(data.scores || []);
         setScoreInput("");
         setScoreDate("");
-        setScoreMsg("✓ Score add ho gaya!");
+        setScoreMsg("✓ Score added successfully!");
       } else {
-        setScoreMsg(data.message || "Error aaya.");
+        setScoreMsg(data.message || "Something went wrong.");
       }
     } catch {
-      setScoreMsg("Server se connect nahi ho paya.");
+      setScoreMsg("Could not connect to server.");
     }
   };
 
@@ -104,7 +89,6 @@ export default function Dashboard() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#080a0f", color: "#fff", fontFamily: "'DM Sans', sans-serif" }}>
-      {/* Google Fonts */}
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600&family=Syne:wght@700;800&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -132,11 +116,12 @@ export default function Dashboard() {
       </div>
 
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "40px 24px" }}>
-        {/* Subscription Badge */}
+
+        {/* Header */}
         <div style={{ marginBottom: 32, display: "flex", alignItems: "center", gap: 12 }}>
           <div>
             <h1 style={{ fontFamily: "'Syne', sans-serif", fontWeight: 800, fontSize: 28, letterSpacing: -1 }}>Dashboard</h1>
-            <p style={{ color: "#6b7280", fontSize: 14, marginTop: 4 }}>Apna golf journey track karo</p>
+            <p style={{ color: "#6b7280", fontSize: 14, marginTop: 4 }}>Track your golf journey</p>
           </div>
           <div style={{ marginLeft: "auto", background: user?.subscription?.status === "active" ? "#052e16" : "#1a1107", border: `1px solid ${user?.subscription?.status === "active" ? "#4ade80" : "#f59e0b"}44`, borderRadius: 100, padding: "6px 16px", fontSize: 12, color: user?.subscription?.status === "active" ? "#4ade80" : "#f59e0b", fontWeight: 600 }}>
             {user?.subscription?.status === "active" ? "✓ Active Subscriber" : "⚠ No Active Plan"}
@@ -154,7 +139,8 @@ export default function Dashboard() {
         {/* Tabs */}
         <div style={{ display: "flex", gap: 4, marginBottom: 28, background: "#0f1117", padding: 6, borderRadius: 12, width: "fit-content" }}>
           {tabs.map(t => (
-            <button key={t} className="tab-btn" onClick={() => setTab(t)} style={{ color: tab === t ? "#fff" : "#6b7280", background: tab === t ? "#1e2130" : "none", fontWeight: tab === t ? 600 : 400, textTransform: "capitalize" }}>
+            <button key={t} className="tab-btn" onClick={() => setTab(t)}
+              style={{ color: tab === t ? "#fff" : "#6b7280", background: tab === t ? "#1e2130" : "none", fontWeight: tab === t ? 600 : 400, textTransform: "capitalize" }}>
               {t === "overview" ? "📊 Overview" : t === "scores" ? "⛳ Scores" : t === "charity" ? "💚 Charity" : "🎯 Draws"}
             </button>
           ))}
@@ -167,23 +153,23 @@ export default function Dashboard() {
             {/* OVERVIEW TAB */}
             {tab === "overview" && (
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-                {/* Recent Scores */}
                 <div style={{ background: "#0f1117", borderRadius: 16, border: "1px solid #1a1d26", padding: 24 }}>
                   <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: 16, marginBottom: 16, color: "#4ade80" }}>Recent Scores</h3>
-                  {scores.length === 0 ? <p style={{ color: "#4b5563", fontSize: 14 }}>Koi score nahi hai abhi.</p> : scores.slice(0, 5).map((s, i) => (
-                    <div key={i} className="score-row" style={{ display: "flex", justifyContent: "space-between", padding: "10px 0", borderBottom: "1px solid #1a1d26", transition: "background 0.15s", borderRadius: 6, padding: "10px 8px" }}>
-                      <span style={{ color: "#9ca3af", fontSize: 13 }}>{new Date(s.date).toLocaleDateString("en-GB")}</span>
-                      <span style={{ color: "#fff", fontWeight: 600 }}>{s.score} pts</span>
-                    </div>
-                  ))}
+                  {scores.length === 0
+                    ? <p style={{ color: "#4b5563", fontSize: 14 }}>No scores recorded yet.</p>
+                    : scores.slice(0, 5).map((s, i) => (
+                      <div key={i} className="score-row" style={{ display: "flex", justifyContent: "space-between", padding: "10px 8px", borderBottom: "1px solid #1a1d26", borderRadius: 6, transition: "background 0.15s" }}>
+                        <span style={{ color: "#9ca3af", fontSize: 13 }}>{new Date(s.date).toLocaleDateString("en-GB")}</span>
+                        <span style={{ color: "#fff", fontWeight: 600 }}>{s.score} pts</span>
+                      </div>
+                    ))}
                 </div>
-                {/* Subscription Info */}
                 <div style={{ background: "#0f1117", borderRadius: 16, border: "1px solid #1a1d26", padding: 24 }}>
                   <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: 16, marginBottom: 16, color: "#60a5fa" }}>Subscription</h3>
                   <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
                     {[
                       ["Plan", user?.subscription?.plan || "—"],
-                      ["Status", user?.subscription?.status || "inactive"],
+                      ["Status", user?.subscription?.status || "Inactive"],
                       ["Renewal", user?.subscription?.renewalDate ? new Date(user.subscription.renewalDate).toLocaleDateString("en-GB") : "—"],
                     ].map(([k, v]) => (
                       <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: 14 }}>
@@ -193,7 +179,8 @@ export default function Dashboard() {
                     ))}
                   </div>
                   {user?.subscription?.status !== "active" && (
-                    <button className="action-btn" onClick={() => window.location.href = "/pricing"} style={{ background: "linear-gradient(135deg,#4ade80,#22c55e)", color: "#000", width: "100%", marginTop: 20 }}>
+                    <button className="action-btn" onClick={() => window.location.href = "/pricing"}
+                      style={{ background: "linear-gradient(135deg,#4ade80,#22c55e)", color: "#000", width: "100%", marginTop: 20 }}>
                       Subscribe Now
                     </button>
                   )}
@@ -204,9 +191,8 @@ export default function Dashboard() {
             {/* SCORES TAB */}
             {tab === "scores" && (
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
-                {/* Add Score */}
                 <div style={{ background: "#0f1117", borderRadius: 16, border: "1px solid #1a1d26", padding: 24 }}>
-                  <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: 16, marginBottom: 20, color: "#4ade80" }}>New Score Add Karo</h3>
+                  <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: 16, marginBottom: 20, color: "#4ade80" }}>Add New Score</h3>
                   <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                     <div>
                       <label style={{ color: "#6b7280", fontSize: 12, letterSpacing: 0.5, marginBottom: 6, display: "block" }}>STABLEFORD SCORE (1–45)</label>
@@ -217,22 +203,27 @@ export default function Dashboard() {
                       <input className="inp" type="date" value={scoreDate} onChange={e => setScoreDate(e.target.value)} max={new Date().toISOString().split("T")[0]} />
                     </div>
                     {scoreMsg && <p style={{ fontSize: 13, color: scoreMsg.startsWith("✓") ? "#4ade80" : "#ef4444" }}>{scoreMsg}</p>}
-                    <button className="action-btn" onClick={submitScore} style={{ background: "linear-gradient(135deg,#4ade80,#22c55e)", color: "#000", marginTop: 4 }}>Add Score</button>
+                    <button className="action-btn" onClick={submitScore} style={{ background: "linear-gradient(135deg,#4ade80,#22c55e)", color: "#000", marginTop: 4 }}>
+                      Add Score
+                    </button>
                   </div>
-                  <p style={{ color: "#4b5563", fontSize: 11, marginTop: 12 }}>* Sirf last 5 scores rakhe jate hain. Naya score sabse purana replace karta hai.</p>
+                  <p style={{ color: "#4b5563", fontSize: 11, marginTop: 12 }}>
+                    * Only the last 5 scores are retained. A new score replaces the oldest one.
+                  </p>
                 </div>
-                {/* Score List */}
                 <div style={{ background: "#0f1117", borderRadius: 16, border: "1px solid #1a1d26", padding: 24 }}>
-                  <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: 16, marginBottom: 20, color: "#4ade80" }}>Tera Score History</h3>
-                  {scores.length === 0 ? <p style={{ color: "#4b5563", fontSize: 14 }}>Koi score nahi hai. Pehla score add karo!</p> : scores.map((s, i) => (
-                    <div key={i} className="score-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 10px", borderBottom: "1px solid #1a1d26", borderRadius: 8, transition: "background 0.15s" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-                        <div style={{ width: 32, height: 32, borderRadius: 8, background: "#13151f", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#4ade80", fontWeight: 700 }}>#{i + 1}</div>
-                        <span style={{ color: "#9ca3af", fontSize: 13 }}>{new Date(s.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</span>
+                  <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: 16, marginBottom: 20, color: "#4ade80" }}>Your Score History</h3>
+                  {scores.length === 0
+                    ? <p style={{ color: "#4b5563", fontSize: 14 }}>No scores yet. Add your first score!</p>
+                    : scores.map((s, i) => (
+                      <div key={i} className="score-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "12px 10px", borderBottom: "1px solid #1a1d26", borderRadius: 8, transition: "background 0.15s" }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                          <div style={{ width: 32, height: 32, borderRadius: 8, background: "#13151f", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 12, color: "#4ade80", fontWeight: 700 }}>#{i + 1}</div>
+                          <span style={{ color: "#9ca3af", fontSize: 13 }}>{new Date(s.date).toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })}</span>
+                        </div>
+                        <span style={{ color: "#fff", fontWeight: 700, fontSize: 18 }}>{s.score}</span>
                       </div>
-                      <span style={{ color: "#fff", fontWeight: 700, fontSize: 18 }}>{s.score}</span>
-                    </div>
-                  ))}
+                    ))}
                 </div>
               </div>
             )}
@@ -240,21 +231,31 @@ export default function Dashboard() {
             {/* CHARITY TAB */}
             {tab === "charity" && (
               <div style={{ background: "#0f1117", borderRadius: 16, border: "1px solid #1a1d26", padding: 28, maxWidth: 560 }}>
-                <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: 16, marginBottom: 20, color: "#a78bfa" }}>Teri Charity</h3>
+                <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: 16, marginBottom: 20, color: "#a78bfa" }}>Your Charity</h3>
                 {charity ? (
                   <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
-                    {[["Name", charity.name], ["Category", charity.category || "—"], ["Contribution", `${user?.charityPercentage || 10}% of subscription`]].map(([k, v]) => (
+                    {[
+                      ["Name", charity.name],
+                      ["Category", charity.category || "—"],
+                      ["Contribution", `${user?.charityPercentage || 10}% of subscription`]
+                    ].map(([k, v]) => (
                       <div key={k} style={{ display: "flex", justifyContent: "space-between", fontSize: 14, borderBottom: "1px solid #1a1d26", paddingBottom: 10 }}>
                         <span style={{ color: "#6b7280" }}>{k}</span>
                         <span style={{ color: "#fff", fontWeight: 500 }}>{v}</span>
                       </div>
                     ))}
-                    <button className="action-btn" onClick={() => window.location.href = "/charities"} style={{ background: "#1a1d26", color: "#a78bfa", marginTop: 8 }}>Charity Change Karo</button>
+                    <button className="action-btn" onClick={() => window.location.href = "/charities"}
+                      style={{ background: "#1a1d26", color: "#a78bfa", marginTop: 8 }}>
+                      Change Charity
+                    </button>
                   </div>
                 ) : (
                   <div style={{ textAlign: "center", padding: "32px 0" }}>
-                    <p style={{ color: "#6b7280", fontSize: 14, marginBottom: 20 }}>Koi charity select nahi ki abhi.</p>
-                    <button className="action-btn" onClick={() => window.location.href = "/charities"} style={{ background: "linear-gradient(135deg,#a78bfa,#7c3aed)", color: "#fff" }}>Charity Chunno</button>
+                    <p style={{ color: "#6b7280", fontSize: 14, marginBottom: 20 }}>No charity selected yet.</p>
+                    <button className="action-btn" onClick={() => window.location.href = "/charities"}
+                      style={{ background: "linear-gradient(135deg,#a78bfa,#7c3aed)", color: "#fff" }}>
+                      Choose a Charity
+                    </button>
                   </div>
                 )}
               </div>
@@ -265,7 +266,7 @@ export default function Dashboard() {
               <div style={{ background: "#0f1117", borderRadius: 16, border: "1px solid #1a1d26", padding: 28 }}>
                 <h3 style={{ fontFamily: "'Syne', sans-serif", fontSize: 16, marginBottom: 20, color: "#f59e0b" }}>Draw History</h3>
                 {draws.length === 0 ? (
-                  <p style={{ color: "#4b5563", fontSize: 14 }}>Koi draw history nahi hai abhi.</p>
+                  <p style={{ color: "#4b5563", fontSize: 14 }}>No draw history yet.</p>
                 ) : draws.map((d, i) => (
                   <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "14px 0", borderBottom: "1px solid #1a1d26" }}>
                     <div>
@@ -274,7 +275,7 @@ export default function Dashboard() {
                     </div>
                     <div style={{ textAlign: "right" }}>
                       <p style={{ fontSize: 14, color: d.won ? "#4ade80" : "#6b7280", fontWeight: 600 }}>{d.won ? `Won £${d.prize}` : "No win"}</p>
-                      <p style={{ fontSize: 11, color: "#4b5563", marginTop: 2 }}>{d.status || "completed"}</p>
+                      <p style={{ fontSize: 11, color: "#4b5563", marginTop: 2 }}>{d.status || "Completed"}</p>
                     </div>
                   </div>
                 ))}

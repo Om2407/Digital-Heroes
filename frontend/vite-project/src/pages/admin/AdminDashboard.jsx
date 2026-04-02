@@ -33,14 +33,19 @@ export default function AdminDashboard() {
   if (user && user.role !== "admin") {
     return (
       <div style={{ color: "red", padding: 40, textAlign: "center" }}>
-        Access Denied
+        Access Denied — Admins Only
       </div>
     );
   }
 
   return (
     <div style={{ minHeight: "100vh", background: "#070910", color: "#fff", fontFamily: "sans-serif", padding: 32 }}>
-      <h1 style={{ marginBottom: 24 }}>Admin Dashboard</h1>
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 24 }}>
+        <h1 style={{ fontSize: 28, fontWeight: 700 }}>Admin Dashboard</h1>
+        <span style={{ background: "#1a0a3d", border: "1px solid #a78bfa33", borderRadius: 100, padding: "6px 16px", fontSize: 12, color: "#a78bfa", fontWeight: 600 }}>
+          Admin Panel
+        </span>
+      </div>
 
       {loading ? (
         <p style={{ color: "#6b7280" }}>Loading...</p>
@@ -78,7 +83,7 @@ export default function AdminDashboard() {
                 {users.length === 0 ? (
                   <tr>
                     <td colSpan={5} style={{ padding: 40, textAlign: "center", color: "#4b5563" }}>
-                      Koi user nahi hai
+                      No users found.
                     </td>
                   </tr>
                 ) : (
@@ -88,8 +93,12 @@ export default function AdminDashboard() {
                       <td style={{ padding: "12px 16px", color: "#9ca3af" }}>{u.email}</td>
                       <td style={{ padding: "12px 16px", color: "#60a5fa", textTransform: "capitalize" }}>{u.subscription?.plan || "—"}</td>
                       <td style={{ padding: "12px 16px" }}>
-                        <span style={{ background: u.subscription?.status === "active" ? "#052e16" : "#1a1107", color: u.subscription?.status === "active" ? "#4ade80" : "#f59e0b", borderRadius: 100, padding: "3px 10px", fontSize: 11, fontWeight: 600 }}>
-                          {u.subscription?.status || "inactive"}
+                        <span style={{
+                          background: u.subscription?.status === "active" ? "#052e16" : "#1a1107",
+                          color: u.subscription?.status === "active" ? "#4ade80" : "#f59e0b",
+                          borderRadius: 100, padding: "3px 10px", fontSize: 11, fontWeight: 600
+                        }}>
+                          {u.subscription?.status || "Inactive"}
                         </span>
                       </td>
                       <td style={{ padding: "12px 16px", color: "#9ca3af" }}>{u.scores?.length || 0}/5</td>
@@ -100,7 +109,10 @@ export default function AdminDashboard() {
             </table>
           </div>
 
-          <button onClick={logout} style={{ marginTop: 24, background: "#1a1d26", color: "#ef4444", border: "none", borderRadius: 8, padding: "10px 20px", cursor: "pointer", fontSize: 14 }}>
+          <button
+            onClick={logout}
+            style={{ marginTop: 24, background: "#1a1d26", color: "#ef4444", border: "none", borderRadius: 8, padding: "10px 20px", cursor: "pointer", fontSize: 14 }}
+          >
             Logout
           </button>
         </>
